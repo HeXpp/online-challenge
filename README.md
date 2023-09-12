@@ -46,4 +46,7 @@ $mangoToVerify = "9752752362299246";
 ```
 And you're done! Just put that index.php to any server with php support (000webhost or infinityfree are fantastic options) and make sure that the MySQL server stays running! Both of these 2 services (000webhost/infinityfree) gives you a MySQL server apart from the PHP server, so you can host this system.
 
+## How this works?
+I didn't write this part of the guide yet since the code isn't out. Probably tomorrow?
+
 
