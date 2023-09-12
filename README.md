@@ -28,5 +28,22 @@ CREATE TABLE IF NOT EXISTS user_info (
     expert_record INT(11)
 );
 ```
+Then, download *index.php* and find this lines. This part is the configuration. Replace the example data with your data and put a "mango". The mango is the token, I don't really know why the token has that name, probably I was eating mango while I was writing that function.
+```
+<?php
+$servername = "127.0.0.1";
+$username_db = "hexp";
+$password_db = "hexpdelpino";
+$dbname = "dsm2";
+
+$conn = new mysqli($servername, $username_db, $password_db, $dbname);
+
+if ($conn->connect_error) {
+    die("db connection error: " . $conn->connect_error);
+}
+
+$mangoToVerify = "9752752362299246";
+```
+And you're done! Just put that index.php to any server with php support (000webhost or infinityfree are fantastic options) and make sure that the MySQL server stays running! Both of these 2 services (000webhost/infinityfree) gives you a MySQL server apart from the PHP server, so you can host this system.
 
 
