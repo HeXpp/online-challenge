@@ -1,10 +1,11 @@
 # Endless Challenge Online System (onlinechallenge)
+# PHP VERSION IS NOW DEPRECATED BECAUSE OF SECURITY ISSUES, SEE THE REWRITE IN NODE.JS
 
 ![banner (1)](https://github.com/HeXpp/online-challenge/assets/97027903/573f55a0-b1b3-4317-8f89-9e2eea52bd76)
 
 Cheap to host, easy to implement online system used in SMM:WE 3.4.0
 ## Features
-- Works only with a PHP server and a MySQL server
+- Works only with a PHP server and a MySQL server (deprecated)
 - Progress and lives storage
 - Player leaderboards (highest records on each difficulty)
 - Independent from the main online system developed by DangerousZone
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     expert_record INT(11)
 );
 ```
-Then, download *index.php* and find this lines. This part is the configuration. Replace the example data with your data and put a "mango". The mango is the token, I don't really know why the token has that name, probably I was eating mango while I was writing that function.
+Then, clone the repository and edit the configuration settings with your DB credentials.
 ```
 <?php
 $servername = "127.0.0.1";
