@@ -1,8 +1,8 @@
 # Endless Challenge Online System (onlinechallenge)
-# PHP VERSION IS NOW DEPRECATED BECAUSE OF SECURITY ISSUES, SEE THE REWRITE IN NODE.JS
 
 ![banner (1)](https://github.com/HeXpp/online-challenge/assets/97027903/573f55a0-b1b3-4317-8f89-9e2eea52bd76)
 
+# PHP VERSION IS NOW DEPRECATED BECAUSE OF SECURITY ISSUES, SEE THE REWRITE IN NODE.JS
 Cheap to host, easy to implement online system used in SMM:WE 3.4.0
 ## Features
 - Works only with a PHP server and a MySQL server (deprecated)
@@ -11,7 +11,7 @@ Cheap to host, easy to implement online system used in SMM:WE 3.4.0
 - Independent from the main online system developed by DangerousZone
 
 ## Setup
-First, create a MySQL db with this command. Replace "dsm" and "user_info" with whatever you want.
+### First, create a MySQL db with this command. Replace "dsm" and "user_info" with whatever you want.
 ```
 CREATE DATABASE IF NOT EXISTS dsm;
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     expert_record INT(11)
 );
 ```
-Then, clone the repository and edit the configuration settings with your DB credentials.
+### Then, clone the repository and edit the configuration settings with your DB credentials.
 ```
 <?php
 $servername = "127.0.0.1";
