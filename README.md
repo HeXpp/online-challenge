@@ -28,30 +28,47 @@ CREATE TABLE IF NOT EXISTS user_info (
     expert_record INT(11)
 );
 ```
-### Then, clone the repository and edit the configuration settings with your DB credentials and the port you desire the server to run on.
+### Then, clone the repository and edit the configuration settings with your DB credentials, the ratelimiting you desire, the mango you desire and the port you desire the server to run on.
 ```
-<?php
-$servername = "127.0.0.1";
-$username_db = "hexp";
-$password_db = "hexpdelpino";
-$dbname = "dsm2";
+const dbConfig = {
+  host: 'localhost',
+  user: 'user',
+  password: 'pw',
+  database: 'db'
+};
+```
+```
+// ratelimiting
+const limiter = rateLimit({
+  windowMs: 1000,
+  max: 5,
+  message: 'Sending requests too fast, please slow down',
+});
+```
+```
+// mango verify
+app.use((req, res, next) => {
+  const mangoToVerify = 'mango';
+  const { mango } = req.body;
 
-$conn = new mysqli($servername, $username_db, $password_db, $dbname);
+  if (!mango || mango !== mangoToVerify) {
+    return res.status(401).send('Mango's missing or is incorrect');
+  }
 
-if ($conn->connect_error) {
-    die("db connection error: " . $conn->connect_error);
-}
+  next();
+});
+```
 
-$mangoToVerify = "9752752362299246";
+### Lastly, install the dependencies
+They're already declared on package.json so you can just do:
+```
+npm install
 ```
 ## Starting the server
-
-Run the batch file called "run.bat" or:
+If you're in Windows, run the batch file called "run.bat" or:
 ```
 node index.mjs
 ```
-Give me an ⭐ if you liked my work!
-
 ## How this works?
 I didn't write this part of the guide yet since the code isn't out. Probably tomorrow?
 
