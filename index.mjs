@@ -16,28 +16,28 @@ const dbConfig = {
 
 const conn = mysql.createConnection(dbConfig);
 
-// Middleware de límite de velocidad
+// ratelimiting
 const limiter = rateLimit({
-  windowMs: 1000, // Ventana de 1 segundo
-  max: 5, // Máximo de 5 solicitudes por ventana
-  message: 'Sending requests too fast, please slow down', // Mensaje de error cuando se alcanza el límite
+  windowMs: 1000,
+  max: 5,
+  message: 'Sending requests too fast, please slow down',
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use(limiter); // Aplica el middleware de límite de velocidad a todas las rutas
+app.use(limiter);
 
-// Middleware para verificar el mango en cada solicitud
+// mango verify
 app.use((req, res, next) => {
-  const mangoToVerify = '8871336752826128';
+  const mangoToVerify = 'mango';
   const { mango } = req.body;
 
   if (!mango || mango !== mangoToVerify) {
     return res.status(401).send('Unauthorized access, fuck u');
   }
 
-  next(); // Continúa con la siguiente ruta si el mango es válido
+  next();
 });
 
 app.post('/createUser', (req, res) => {
@@ -65,7 +65,6 @@ app.post('/createUser', (req, res) => {
 });
 
 app.post('/editUser', (req, res) => {
-  // Verificación de mango ya se maneja mediante el middleware
 
   const { username, column, mode, quantity } = req.body;
 
@@ -117,7 +116,7 @@ app.post('/editUser', (req, res) => {
 });
 
 function sendDiscordLog(username, column, previousValue, currentValue) {
-  const discordWebhookURL = 'https://discord.com/api/webhooks/1153073201962827786/i3LALNIwAIpr58dsB2WJ507FZGo6R7YvPRdcICTp_7qV3Qk7UB5HAGG-JpmWPL_FT3U8';
+  const discordWebhookURL = 'guebjuk';
 
   const difficulty = getDifficultyFromColumn(column);
 
@@ -154,7 +153,6 @@ app.post('/showData', (req, res) => {
 });
 
 app.post('/setDifficulty', (req, res) => {
-  // Verificación de mango ya se maneja mediante el middleware
 
   const { username, mode } = req.body;
   const allowedModes = ['easy', 'normal', 'hard', 'expert'];
@@ -192,7 +190,6 @@ app.post('/setDifficulty', (req, res) => {
 });
 
 app.post('/generateLeaderboard', (req, res) => {
-  // Verificación de mango ya se maneja mediante el middleware
 
   const { difficulty } = req.body;
 
@@ -221,8 +218,6 @@ app.post('/generateLeaderboard', (req, res) => {
   });
 });
 
-app.post('/eraseUser', (req, res) => {
-  // Verificación de mango ya se maneja mediante el middleware
 
   const { username } = req.body;
   const sql = 'DELETE FROM users WHERE username = ?';
