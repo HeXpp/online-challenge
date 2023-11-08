@@ -44,7 +44,9 @@ if ($conn->connect_error) {
 
 $mangoToVerify = "9752752362299246";
 ```
-### And you're probably done! If you now just a bit of node.js you will know how to start the server, but if not:
+## Starting the server
+
+Run the batch file called "run.bat" or:
 ```
 node index.mjs
 ```
