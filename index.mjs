@@ -218,19 +218,6 @@ app.post('/generateLeaderboard', (req, res) => {
   });
 });
 
-
-  const { username } = req.body;
-  const sql = 'DELETE FROM users WHERE username = ?';
-
-  conn.query(sql, [username], (err, result) => {
-    if (err) {
-      res.status(500).send('An error occurred');
-    } else {
-      res.send('User erased');
-    }
-  });
-});
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
