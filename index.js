@@ -8,10 +8,10 @@ const app = express();
 const port = 8080;
 
 const dbConfig = {
-  host: '127.0.0.1',
-  user: 'hexp',
-  password: 'hexpdelpino',
-  database: 'dsm2'
+  host: 'localhost',
+  user: 'user',
+  password: 'pw',
+  database: 'db'
 };
 
 const conn = mysql.createConnection(dbConfig);
