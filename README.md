@@ -67,7 +67,7 @@ npm install
 ## Starting the server
 If you're in Windows, run the batch file called "run.bat" or:
 ```
-node index.mjs
+node index.js
 ```
 ## How this works?
 I didn't write this part of the guide yet since the code isn't out. Probably tomorrow?
