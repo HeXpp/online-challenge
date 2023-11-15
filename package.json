@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "dsm2.0",
   "version": "1.0.0",
   "description": "Endless Challenge online system rewritten in node.js",
