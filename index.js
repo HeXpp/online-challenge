@@ -23,6 +23,7 @@ const limiter = rateLimit({
   message: 'Sending requests too fast, please slow down',
 });
 
+app.set('trust proxy', 1);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
