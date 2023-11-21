@@ -5,7 +5,8 @@
   "description": "Endless Challenge online system rewritten in node.js",
   "main": "index.js",
   "scripts": {
-    "test": "a"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "module",
@@ -16,7 +17,7 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
-    "express-rate-limit": "^7.1.3",
+    "express-rate-limit": "^7.1.4",
     "mysql": "^2.18.1",
     "node-fetch": "^3.3.2"
   }
