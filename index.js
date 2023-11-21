@@ -1,20 +1,31 @@
-import express from 'express';
+import express from 'express'
 import bodyParser from 'body-parser';
 import mysql from 'mysql';
 import fetch from 'node-fetch';
 import rateLimit from 'express-rate-limit';
 
 const app = express();
-const port = 8080;
+const port = 25577;
 
-const dbConfig = {
+// Configuración de la conexión a la base de datos con SSL/TLS
+const conn = mysql.createConnection({
   host: 'localhost',
   user: 'user',
   password: 'pw',
-  database: 'db'
-};
+  database: 'db',
+  ssl: {
+    // Configuración SSL/TLS
+    rejectUnauthorized: false, // En producción, establece esto en 'true'
+  },
+});
 
-const conn = mysql.createConnection(dbConfig);
+conn.connect((err) => { //Verificar conexión en la base de datos.
+  if (err) {
+    console.error('No se puede conectar a la base de datos u-u:', err);
+    return;
+  }
+  console.log('Connected to database');
+});
 
 // ratelimiting
 const limiter = rateLimit({
@@ -31,7 +42,7 @@ app.use(limiter);
 
 // mango verify
 app.use((req, res, next) => {
-  const mangoToVerify = 'mango';
+  const mangoToVerify = 'mangokey';
   const { mango } = req.body;
 
   if (!mango || mango !== mangoToVerify) {
@@ -44,7 +55,10 @@ app.use((req, res, next) => {
 app.post('/createUser', (req, res) => {
   const { username } = req.body;
 
-  const sql = "SELECT 1 FROM users WHERE username = ? LIMIT 1";
+  if (!username) {
+    return res.status(400).send('Username is required');
+  }
+  const sql = "SELECT 1 FROM users WHERE username = ? LIMIT 1;";
 
   conn.query(sql, [username], (err, result) => {
     if (err) {
@@ -52,7 +66,7 @@ app.post('/createUser', (req, res) => {
     } else if (result && result.length > 0) {
       res.send('User already registered');
     } else {
-      const createUserSql = "INSERT INTO users (username, progress, lives, difficulty, level_group, dsm_2, easy_record, normal_record, hard_record, expert_record) VALUES (?, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+      const createUserSql = "INSERT INTO users (username, easy_record, normal_record, hard_record, expert_record) VALUES (?, 0, 0, 0 ,0)";
 
       conn.query(createUserSql, [username], (err, result) => {
         if (err) {
@@ -65,115 +79,59 @@ app.post('/createUser', (req, res) => {
   });
 });
 
-app.post('/resetDifficulty', (req, res) => {
-  const { username, difficulty } = req.body;
-
-  const allowedDifficulties = ['easy', 'normal', 'hard', 'expert'];
-
-  if (!allowedDifficulties.includes(difficulty)) {
-    res.status(400).send(`Invalid difficulty: ${difficulty}`);
-    return;
-  }
-
-  const columnsToReset = [
-    `${difficulty}_progress`,
-    'dsm_2',
-    'level_group'
-  ];
-
-  const resetSql = `UPDATE users SET ${columnsToReset.map(column => `${column} = 0`).join(', ')} WHERE username = ?`;
-
-  conn.query(resetSql, [username], (err, result) => {
-    if (err) {
-      res.status(500).send('An error occurred');
-    } else {
-      res.send(`Progress for difficulty ${difficulty} reset successfully`);
-    }
-  });
-});
-
 app.post('/editUser', (req, res) => {
+
   const { username, column, mode, quantity } = req.body;
 
-  if (column === 'progress' || mode === 'replace') {
-    // Si se está editando el progreso o en el modo "replace", verifique si es necesario actualizar el récord
-    const getPreviousRecordSql = `SELECT progress, difficulty FROM users WHERE username = ?`;
+  const allowedFields = ['easy_record', 'normal_record', 'hard_record', 'expert_record'];
 
-    conn.query(getPreviousRecordSql, [username], (err, result) => {
+  if (!allowedFields.includes(column)) {
+    res.status(400).send(`Field not valid: ${column}`);
+  } else {
+    const getPreviousValueSql = `SELECT ${column} FROM users WHERE username = ?`;
+    
+    conn.query(getPreviousValueSql, [username], (err, result) => {
       if (err) {
         res.status(500).send('An error occurred');
       } else {
-        const { difficulty } = result[0];
-		let difficultyLevel;
-
-		switch (difficulty) {
-		  case 0:
-			difficultyLevel = 'easy';
-			break;
-		  case 1:
-			difficultyLevel = 'normal';
-			break;
-		  case 2:
-			difficultyLevel = 'hard';
-			break;
-		  case 3:
-			difficultyLevel = 'expert';
-			break;
-		  default:
-			difficultyLevel = 'unknown';
-		}
-
-		const recordColumn = `${difficultyLevel}_record`;
+        const previousValue = result[0][column];
+        let sql;
 
         if (mode === 'record') {
-          // Actualizar el progreso y, si es necesario, el récord
-          const updateSql = `UPDATE users SET progress = ?, ${recordColumn} = GREATEST(${recordColumn}, progress) WHERE username = ?`;
-
-          conn.query(updateSql, [quantity, username], (err, result) => {
-            if (err) {
-              res.status(500).send(`An error occurred trying to edit ${column}: ${err.message}`);
-            } else {
-              res.send('Edit successful');
-            }
-          });
+          sql = `UPDATE users SET ${column} = ? WHERE username = ?`;
         } else if (mode === 'add') {
-          // Solo actualizar el progreso
-          const updateSql = `UPDATE users SET progress = ? WHERE username = ?`;
-
-          conn.query(updateSql, [quantity, username], (err, result) => {
-            if (err) {
-              res.status(500).send(`An error occurred trying to edit ${column}: ${err.message}`);
-            } else {
-              res.send('Edit successful');
-            }
-          });
-        } else if (mode === 'replace') {
-          // Modo "replace": actualizar la columna con el nuevo valor
-          const updateSql = `UPDATE users SET ${column} = ? WHERE username = ?`;
-
-          conn.query(updateSql, [quantity, username], (err, result) => {
-            if (err) {
-              res.status(500).send(`An error occurred trying to edit ${column}: ${err.message}`);
-            } else {
-              res.send('Edit successful');
-            }
-          });
+          sql = `UPDATE users SET ${column} = ${column} + ? WHERE username = ?`;
+        } else if (mode === 'remove') {
+          sql = `UPDATE users SET ${column} = ${column} - ? WHERE username = ?`;
         } else {
           res.status(400).send('Unknown edit mode');
+          return;
         }
+
+        conn.query(sql, [quantity, username], (err, result) => {
+          if (err) {
+            res.status(500).send(`An error occurred trying to edit ${column}`);
+          } else {
+            const getCurrentValueSql = `SELECT ${column} FROM users WHERE username = ?`;
+
+            conn.query(getCurrentValueSql, [username], (err, result) => {
+              if (err) {
+                res.status(500).send('An error occurred');
+              } else {
+                const currentValue = result[0][column];
+                sendDiscordLog(username, column, previousValue, currentValue);
+                res.send('Edit successful');
+              }
+            });
+          }
+        });
       }
     });
-  } else {
-    res.status(400).send(`Field not valid: ${column}`);
   }
 });
 
-
-
-
-
-app.post('/showData', (req, res) => {
-  const { username } = req.body;
+app.post('/showData/', (req, res) => {
+  const { username } = req.body
   const sql = 'SELECT * FROM users WHERE username = ?';
 
   conn.query(sql, [username], (err, result) => {
@@ -187,44 +145,41 @@ app.post('/showData', (req, res) => {
   });
 });
 
-app.post('/setDifficulty', (req, res) => {
-
-  const { username, mode } = req.body;
+app.post('/setRecord', (req, res) => {
+  const { username, mode, record } = req.body;
   const allowedModes = ['easy', 'normal', 'hard', 'expert'];
 
   if (!allowedModes.includes(mode)) {
-    res.status(400).send(`${mode} is an unknown difficulty mode`);
-    return;
+    return res.status(400).send(`${mode} is an unknown difficulty mode`);
   }
 
-  let difficultyValue = 0;
-  switch (mode) {
-    case 'easy':
-      difficultyValue = 0;
-      break;
-    case 'normal':
-      difficultyValue = 1;
-      break;
-    case 'hard':
-      difficultyValue = 2;
-      break;
-    case 'expert':
-      difficultyValue = 3;
-      break;
-  }
+  const targetRecord = `${mode}_record`;
+  const sqlSelect = `SELECT ${targetRecord} FROM users WHERE username = ?`;
 
-  const sql = 'UPDATE users SET difficulty = ? WHERE username = ?';
+  conn.query(sqlSelect, [username], (selectErr, selectResult) => {
+    if (selectErr) {
+      return res.status(500).send('An error occurred while fetching data');
+    }
 
-  conn.query(sql, [difficultyValue, username], (err, result) => {
-    if (err) {
-      res.status(500).send('An error occurred');
+    const currentRecord = selectResult[0][targetRecord];
+
+    if (record > currentRecord) {
+      const sqlUpdate = `UPDATE users SET ${targetRecord} = ? WHERE username = ?`;
+
+      conn.query(sqlUpdate, [record, username], (updateErr, updateResult) => {
+        if (updateErr) {
+          res.status(500).send('An error occurred while updating record');
+        } else {
+          res.send('Record set successfully');
+        }
+      });
     } else {
-      res.send('Difficulty set successfully');
+      res.send('Record not greater than current record. No update performed.');
     }
   });
 });
 
-app.post('/generateLeaderboard', (req, res) => {
+app.post('/generateLeaderboard/', (req, res) => {
 
   const { difficulty } = req.body;
 
