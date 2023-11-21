@@ -92,10 +92,11 @@ It allows you to receive data and sort it in a column exclusive to the record lo
 ### POST http://ip:puerto/generateleaderboard/
 Allows you to display the leaderboards table, divided by difficulties. The limit is adjustable within the sql const.
 
+```
 {
      "mango": "yourtoken",
      "difficulty": "easy" // You can choose between "easy", "normal", "hard" and "expert".
 }
-
+```
 
 Among other things that are found within the code.
