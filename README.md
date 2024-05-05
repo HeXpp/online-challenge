@@ -2,7 +2,12 @@
 
 ![banner (1)](https://github.com/HeXpp/online-challenge/assets/97027903/573f55a0-b1b3-4317-8f89-9e2eea52bd76)
 
-Cheap to host, easy to implement online system used in SMM:WE
+💸 Cheap to host, easy to implement online system used in SMM:WE
+
+⚠️ DEPRECATED! Also, this system doesn't have any security measures, so you WILL have to make your own token and auth code system.
+
+⚠️ THIS SYSTEM IS NOT PLUG AND PLAY! You will have to add protection, so you WILL need knowledge in node.js
+
 ## Features
 - Works with Node.js (before it worked with PHP, but because of security issues, is now **deprecated**.)
 - Progress and lives storage with MySQL
